@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <svg width="500" , height="500"></svg>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script>
+      const data = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+
+      const svg = d3.select("svg");
+
+      /**
+       * first try
+       */
+      data.forEach((d, i) => {
+        svg
+          .append("rect")
+          .attr("height", d)
+          .attr("width", 40)
+          .attr("x", 50*i)
+          .attr("y", 100 - d);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <svg width="500" height="500"></svg>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script>
+      const dataFile = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+      const color = [
+        "skyblue",
+        "blue",
+        "lime",
+        "red",
+        "yellogreen",
+        "violet",
+        "blueviolet",
+        "chocolate",
+        "darkgreen",
+        "yellow"
+      ];
+      const svg = d3.select("svg");
+
+      svg.selectAll('bar')
+        .data(dataFile)
+        .enter().append('rect')
+        .attr('fill', (d, i) => color[i])
+        .attr('width', 40)
+        .attr('height', (d, i) => d)
+        .attr('x', (d, i) => 50 * i)
+        .attr('y', (d, i) => 100 - d);
+    </script>
+  </body>
+</html>
