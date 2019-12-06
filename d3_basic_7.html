@@ -23,10 +23,10 @@
         .data(data)
         .enter()
         .append("rect")
-        .attr("x", function(d, i) {
+        .attr("y", function(d, i) {
           return i * (w / data.length);
         })
-        .attr("y", function(d) {
+        .attr("x", function(d) {
           console.log(d);
           return h - d;
         })
@@ -46,10 +46,10 @@
         .text(function(d) {
           return d;
         })
-        .attr("x", function(d, i) {
+        .attr("y", function(d, i) {
           return i * (w / data.length) + w / data.length / 2;
         })
-        .attr("y", function(d) {
+        .attr("x", function(d) {
           return h - d + 10;
         })
         .attr("font-family", "sans-serif")

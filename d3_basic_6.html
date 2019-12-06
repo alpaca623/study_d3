@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>basic_6</title>
   </head>
   <body>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -20,11 +20,56 @@
         })
         .then(response => {
           const {
-            data: { WORLDJOB: items }
+            data: {
+              WORLDJOB: { ITEM: items }
+            }
           } = response;
-          d3.select("body")
-            .append("div")
-            .text("hihi");
+          var w = 1000;
+          var h = 500;
+
+          var svg = d3
+            .select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+          svg
+            .selectAll("rect")
+            .data(items)
+            .enter()
+            .append("rect")
+            .attr("x", function(d, i) {
+              return i * (w / items.length);
+            })
+            .attr("y", function(d) {
+              return h - d.CNT;
+            })
+            .attr("width", w / items.length - 1)
+            .attr("height", function(d) {
+              return d.CNT;
+            })
+            .attr("fill", function(d) {
+              return "blue";
+            });
+
+          svg
+            .selectAll("text")
+            .data(items)
+            .enter()
+            .append("text")
+            .text(function(d) {
+              return d.NAME;
+            })
+            .attr("x", function(d, i) {
+              return i * (w / items.length) + w / items.length / 2;
+            })
+            .attr("y", function(d) {
+              return h - d.CNT + 10;
+            })
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "12px")
+            .attr("fill", "black")
+            .attr("text-anchor", "middle");
         });
     </script>
   </body>
