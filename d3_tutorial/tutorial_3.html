@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>bar-3</title>
+    <style>
+      .chart rect {
+        fill: steelblue;
+      }
+
+      .chart text {
+        fill: white;
+        font: 10px sans-serif;
+        text-anchor: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="chart"></svg>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script>
+      var data = [
+        { A: 0.08167 },
+        { B: 0.01492 },
+        { C: 0.02782 },
+        { D: 0.04253 },
+        { E: 0.12702 },
+        { F: 0.02288 },
+        { G: 0.02015 },
+        { H: 0.06094 },
+        { I: 0.06966 },
+        { J: 0.00153 },
+        { K: 0.00772 },
+        { L: 0.04025 },
+        { M: 0.02406 },
+        { N: 0.06749 },
+        { O: 0.07507 },
+        { P: 0.01929 },
+        { Q: 0.00095 },
+        { R: 0.05987 },
+        { S: 0.06327 },
+        { T: 0.09056 },
+        { U: 0.02758 },
+        { V: 0.00978 },
+        { W: 0.0236 },
+        { X: 0.0015 },
+        { Y: 0.01974 },
+        { Z: 0.00074 }
+      ];
+      var width = 960;
+      var height = 500;
+
+      var chart = d3
+        .select(".chart")
+        .attr("width", width)
+        .attr("height", height);
+
+      var barWidth = data.length / width;
+
+      var bar = chart
+        .selectAll("g")
+        .data(data)
+        .enter()
+        .append("g")
+        .attr("transform", function(d, i) {
+          return "translate(" + i * barWidth + ",0)";
+        });
+
+      var y = d3.scale
+        .linear()
+        .domain([
+          0,
+          d3.max(data, function(d) {
+            return d.value;
+          })
+        ])
+        .range([height, 0]);
+
+      bar
+        .append("rect")
+        .attr("y", function(d) {
+          return y(d.value);
+        })
+        .attr("width", barWidth - 1)
+        .attr("height", function(d) {
+          return height - y(d.value);
+        });
+    </script>
+  </body>
+</html>
