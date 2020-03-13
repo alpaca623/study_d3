@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pop2010-d3</title>
+    <style>
+      body {
+        font-family: Helvetica;
+      }
+      svg {
+        width: 500px;
+        height: 500px;
+      }
+      .top-label {
+        font-size: 13px;
+        font-style: italic;
+        text-transform: uppercase;
+        float: left;
+      }
+      .age-label {
+        text-align: right;
+        font-weight: bold;
+        width: 90px;
+        padding-right: 10px;
+      }
+      .clearfix {
+        clear: both;
+      }
+      .bar {
+        fill: darkslateblue;
+      }
+      .bar-label {
+        text-anchor: end;
+      }
+      .axis-label {
+        text-anchor: middle;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
+      const body = d3.select("body");
+      body.append("h2").text("Age distribution of the world, 2010");
+      body
+        .append("div")
+        .attr("class", "top-label age-label")
+        .append("p")
+        .text("age group");
+      body
+        .append("div")
+        .attr("class", "top-label")
+        .append("p")
+        .text("portion of the population");
+      body.append("div").attr("class", "clearfix");
+
+      const svg = body.append("svg");
+
+      const labelList = [
+        "80 and up",
+        "75-79",
+        "70-74",
+        "69-65",
+        "60-64",
+        "59-55",
+        "50-54",
+        "49-45",
+        "44-40",
+        "39-35",
+        "34-30",
+        "29-25",
+        "24-20",
+        "19-15",
+        "10-14",
+        "5-9",
+        "0-4"
+      ];
+      const popData = [
+        1.6,
+        1.5,
+        2.1,
+        2.6,
+        3.4,
+        4.5,
+        5.1,
+        6.0,
+        6.6,
+        7.1,
+        7.3,
+        8.1,
+        8.9,
+        8.8,
+        8.6,
+        8.8,
+        9.3
+      ];
+      const axisData = [0, 2.5, 5, 7.5];
+
+      const width = 400;
+      const leftMargin = 100;
+      const topMargin = 30;
+      const barHeight = 20;
+      const barGap = 5;
+      const barSpacing = barHeight + barGap;
+      const scaleFactor = width / popData[16];
+      const translateText = `translate(${leftMargin},${topMargin})`;
+      const scaleText = `scale(${scaleFactor},1)`;
+      const tickGap = 5;
+      const tickHeight = 10;
+      const labelGroup = svg
+        .append("g")
+        .attr("transform", translateText)
+        .attr("class", "bar-label");
+      for (let i = 0; i < labelList.length; i++) {
+        labelGroup
+          .append("text")
+          .attr("x", -10)
+          .attr("y", i * barSpacing + barHeight * (2 / 3))
+          .text(labelList[i]);
+      }
+
+      const barGroup = svg
+        .append("g")
+        .attr("transform", `${translateText} ${scaleText}`)
+        .attr("class", "bar");
+      for (let i = 0; i < popData.length; i++) {
+        barGroup
+          .append("rect")
+          .attr("x", 0)
+          .attr("y", barSpacing * i)
+          .attr("height", barHeight)
+          .attr("width", popData[i]);
+      }
+
+      const headerGroupLine = svg
+        .append("g")
+        .attr("transform", translateText)
+        .attr("stroke", "black");
+      const headerGroupNum = svg
+        .append("g")
+        .attr("transform", translateText)
+        .attr("class", "axis-label");
+      for (let i = 0; i < axisData.length; i++) {
+        headerGroupLine
+          .append("line")
+          .attr("x1", axisData[i] * scaleFactor)
+          .attr("x2", axisData[i] * scaleFactor)
+          .attr("y1", 0)
+          .attr("y2", -tickHeight);
+        headerGroupNum
+          .append("text")
+          .text(`${axisData[i]}%`)
+          .attr("x", axisData[i]*scaleFactor)
+          .attr("y", -tickHeight - tickGap);
+      }
+    </script>
+  </body>
+</html>
