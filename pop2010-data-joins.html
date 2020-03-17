@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pop2010-data-join</title>
+    <style>
+      body {
+        font-family: Helvetica;
+      }
+      svg {
+        width: 500px;
+        height: 500px;
+      }
+      .top-label {
+        font-size: 13px;
+        font-style: italic;
+        text-transform: uppercase;
+        float: left;
+      }
+      .age-label {
+        text-align: right;
+        font-weight: bold;
+        width: 90px;
+        padding-right: 10px;
+      }
+      .clearfix {
+        clear: both;
+      }
+      .bar {
+        fill: darkslateblue;
+      }
+      .bar-label {
+        text-anchor: end;
+      }
+      .axis-label {
+        text-anchor: middle;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
+      const body = d3.select("body");
+      body.append("h2").text("Age distribution of the world, 2010");
+      body
+        .append("div")
+        .attr("class", "top-label age-label")
+        .append("p")
+        .text("age group");
+      body
+        .append("div")
+        .attr("class", "top-label")
+        .append("p")
+        .text("portion of the population");
+      body.append("div").attr("class", "clearfix");
+
+      const popData = [
+        { age: "80 and up", value: 1.6, position: 0 },
+        { age: "75 - 79", value: 1.5, position: 1 },
+        { age: "70 - 74", value: 2.1, position: 2 },
+        { age: "69 - 65", value: 2.6, position: 3 },
+        { age: "60 - 64", value: 3.4, position: 4 },
+        { age: "59 - 55", value: 4.5, position: 5 },
+        { age: "50 - 54", value: 5.1, position: 6 },
+        { age: "49 - 45", value: 6.0, position: 7 },
+        { age: "40 - 44", value: 6.6, position: 8 },
+        { age: "39 - 35", value: 7.1, position: 9 },
+        { age: "34 - 30", value: 7.3, position: 10 },
+        { age: "29 - 25", value: 8.1, position: 11 },
+        { age: "24 - 20", value: 8.9, position: 12 },
+        { age: "19 - 15", value: 8.8, position: 13 },
+        { age: "10 - 14", value: 8.6, position: 14 },
+        { age: "5 - 9", value: 8.8, position: 15 },
+        { age: "0 - 4", value: 9.3, position: 16 }
+      ];
+
+      const axisDatas = [0, 2.5, 5, 7.5];
+
+      const svg = body.append("svg");
+
+      const width = 400;
+      const scaleFactor = width / 9.3; // (가로길이를 배열의 최대값(그래프의 최대값)으로 나눠 비율을 구한다)
+      // console.log(scaleFactor);
+      const leftMargin = 100; // 왼쪽 여백 주기(그래프 본체의 기준을 잡아줌)
+      const topMargin = 30; // 위에 여백 주기(그래프 본체의 기준을 잡아줌)
+      const translate = `translate(${leftMargin},${topMargin})`;
+      const scale = `scale(${scaleFactor}, 1)`; // 그래프의 비율을 잡아줌(현재는 datas 배열의 가장 최고값인 9.3을 100으로 잡는다)
+      const barHeight = 20; // 막대의 높이
+      const barGap = 5; // 막대 사이의 간격
+      const barSpacing = barHeight + barGap; // 막대의 y좌표를 잡아준다.
+
+      const tickGap = 5; // x축 범례..(?)의 위치를 잡기 위한 변수
+      const tickHeight = 10;
+
+      const barGroup = svg
+        .append("g")
+        .attr("transform", `${translate} ${scale}`)
+        .attr("class", "bar");
+
+      const barLabelGroup = svg
+        .append("g")
+        .attr("transform", translate)
+        .attr("class", "bar-label");
+
+      const axis = svg
+        .append("g")
+        .attr("transform", translate)
+        .attr("stroke", "black");
+
+      const axisLabel = svg
+        .append("g")
+        .attr("transform", translate)
+        .attr("class", "axis-label");
+
+      barGroup
+        .selectAll("rect")
+        .data(popData)
+        .enter()
+        .append("rect")
+        .attr("x", 0)
+        .attr("width", d => d.value)
+        .attr("y", d => d.position * barSpacing)
+        .attr("height", barHeight);
+
+      barLabelGroup
+        .selectAll("rect")
+        .data(popData)
+        .enter()
+        .append("text")
+        .attr("y", d => d.position * barSpacing + barHeight * (2 / 3))
+        .attr("x", -10)
+        .text(d => d.age);
+
+      axis
+        .selectAll("line")
+        .data(axisDatas)
+        .enter()
+        .append("line")
+        .attr("x1", d => d * scaleFactor)
+        .attr("x2", d => d * scaleFactor)
+        .attr("y1", 0)
+        .attr("y2", -tickHeight);
+
+      axisLabel
+        .selectAll("text")
+        .data(axisDatas)
+        .enter()
+        .append("text")
+        .attr("x", d => d * scaleFactor)
+        .attr("y", -tickHeight - tickGap)
+        .text(d => d + "%");
+    </script>
+  </body>
+</html>
