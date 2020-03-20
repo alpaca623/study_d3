@@ -30,17 +30,18 @@
       .bar {
         fill: darkslateblue;
       }
-      .bar-label {
-        text-anchor: end;
+      .axis path {
+        display: none;
       }
-      .axis {
-        font-size: 13px;
-      }
-      .axis line {
+      .x.axis line {
         fill: none;
         stroke: #000;
       }
-      .axis path {
+      .x.axis path {
+        display: none;
+      }
+
+      .y.axis line {
         display: none;
       }
     </style>
@@ -63,23 +64,23 @@
       body.append("div").attr("class", "clearfix");
 
       const popData = [
-        { age: "80 and up", value: 0.016, position: 0 },
-        { age: "75 - 79", value: 0.015, position: 1 },
-        { age: "70 - 74", value: 0.021, position: 2 },
-        { age: "69 - 65", value: 0.026, position: 3 },
-        { age: "60 - 64", value: 0.034, position: 4 },
-        { age: "59 - 55", value: 0.045, position: 5 },
-        { age: "50 - 54", value: 0.051, position: 6 },
-        { age: "49 - 45", value: 0.06, position: 7 },
-        { age: "40 - 44", value: 0.066, position: 8 },
-        { age: "39 - 35", value: 0.071, position: 9 },
-        { age: "34 - 30", value: 0.073, position: 10 },
-        { age: "29 - 25", value: 0.081, position: 11 },
-        { age: "24 - 20", value: 0.089, position: 12 },
-        { age: "19 - 15", value: 0.088, position: 13 },
-        { age: "10 - 14", value: 0.086, position: 14 },
-        { age: "5 - 9", value: 0.088, position: 15 },
-        { age: "0 - 4", value: 0.093, position: 16 }
+        { age: "80 and up", value: 0.016 },
+        { age: "75 - 79", value: 0.015 },
+        { age: "70 - 74", value: 0.021 },
+        { age: "69 - 65", value: 0.026 },
+        { age: "60 - 64", value: 0.034 },
+        { age: "59 - 55", value: 0.045 },
+        { age: "50 - 54", value: 0.051 },
+        { age: "49 - 45", value: 0.06 },
+        { age: "40 - 44", value: 0.066 },
+        { age: "39 - 35", value: 0.071 },
+        { age: "34 - 30", value: 0.073 },
+        { age: "29 - 25", value: 0.081 },
+        { age: "24 - 20", value: 0.089 },
+        { age: "19 - 15", value: 0.088 },
+        { age: "10 - 14", value: 0.086 },
+        { age: "5 - 9", value: 0.088 },
+        { age: "0 - 4", value: 0.093 }
       ];
 
       const margin = { top: 30, right: 0, bottom: 0, left: 100 };
@@ -99,47 +100,65 @@
         .domain([0, d3.max(popData, o => o.value)]) // 정의역, 0부터 배열 데이터(value)의 최대값을 지정함
         .range([0, width]); // 치역, 0부터 그래프 막대의 최대 길이를 지정해주는데, 이때 width는 가로 길이이다.
 
-      const barHeight = 20; // 막대의 높이
-      const barGap = 5; // 막대 사이의 간격
-      const barSpacing = barHeight + barGap; // 막대의 y좌표를 잡아준다.
+      const y = d3.scale
+        .ordinal()  // 순서 척도를 나타내기 위해 사용
+        .domain(popData.map(pop => pop.age))  // 입력 정의역은 연령대의 배열이다.
+        .rangeBands([0, height], 0.2, 0);     // 선형 척도가 아니라 균등하게 y축의 길이를 잡아준다. 매개변수는 순서대로 범위, 패딩값, 바깥패딩 값이다.
+      // .range([
+      //   0,
+      //   barSpacing,
+      //   2 * barSpacing,
+      //   3 * barSpacing,
+      //   4 * barSpacing,
+      //   5 * barSpacing,
+      //   6 * barSpacing,
+      //   7 * barSpacing,
+      //   8 * barSpacing,
+      //   9 * barSpacing,
+      //   10 * barSpacing,       // 이부분이 rangeBands(...) 으로 변경되는 것.
+      //   11 * barSpacing,
+      //   12 * barSpacing,
+      //   13 * barSpacing,
+      //   14 * barSpacing,
+      //   15 * barSpacing,
+      //   16 * barSpacing
+      // ]);
 
-      const tickGap = 5; // x축 범례..(?)의 위치를 잡기 위한 변수
-      const tickHeight = 10;
-
-      const barGroup = svg.append("g").attr("class", "bar");
-
-      const barLabelGroup = svg.append("g").attr("class", "bar-label");
-
-      // 축을 그리기 위한 준비를 한다.
+      // x 축을 그리기 위한 준비를 한다.
       const xAxis = d3.svg
         .axis()
         .scale(x) // x는 위에서 선언한 축의 선형적 관계의 척도인데, scale에 x를 넣는다는 것은 축의 스케일이 선형 척도인걸 말하는 것이다.
         .orient("top") // 축의 방향을 바꿈
         .ticks(5, "%"); // 눈금의 개수를 조정하는데, 자연수로만 되는듯..
 
+      // y 축을 그리기 위한 준비
+      const yAxis = d3.svg
+        .axis()
+        .scale(y)
+        .orient("left");
+
+      // x 축 그리기
       svg
         .append("g")
-        .call(xAxis)        // 축을 호출한다.
-        .attr("class", "axis"); // 축의 클래스 지정
+        .call(xAxis) // 축을 호출한다.
+        .attr("class", "x axis"); // 축의 클래스 지정
 
-      barGroup
+      // y축 그리기
+      svg
+        .append("g")
+        .call(yAxis)
+        .attr("class", "y axis");
+
+      svg
         .selectAll("rect")
         .data(popData)
         .enter()
         .append("rect")
+        .attr("class", "bar")
         .attr("x", 0)
+        .attr("y", d => y(d.age))
         .attr("width", d => x(d.value))
-        .attr("y", d => d.position * barSpacing)
-        .attr("height", barHeight);
-
-      barLabelGroup
-        .selectAll("rect")
-        .data(popData)
-        .enter()
-        .append("text")
-        .attr("y", d => d.position * barSpacing + barHeight * (2 / 3))
-        .attr("x", -10)
-        .text(d => d.age);
+        .attr("height", y.rangeBand());
     </script>
   </body>
 </html>
