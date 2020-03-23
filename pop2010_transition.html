@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>population</title>
+    <style>
+      body {
+        font-family: Helvetica;
+      }
+      svg {
+        width: 500px;
+        height: 500px;
+      }
+      .top-label {
+        font-size: 13px;
+        font-style: italic;
+        text-transform: uppercase;
+        float: left;
+      }
+      .age-label {
+        text-align: right;
+        font-weight: bold;
+        width: 90px;
+        padding-right: 10px;
+      }
+      .clearfix {
+        clear: both;
+      }
+      .button-container {
+        width: 420px;
+        margin-bottom: 15px;
+      }
+      .button {
+        float: left;
+        margin-left: 10px;
+        font-weight: lighter;
+        cursor: "pointer";
+      }
+      .selected {
+        font-weight: bold;
+      }
+      .bar {
+        fill: DarkSlateBlue;
+      }
+      .bar-label {
+        text-anchor: end;
+      }
+      .axis-label {
+        text-anchor: middle;
+        font-size: 13px;
+      }
+      .x.axis line {
+        fill: none;
+        stroke: #000;
+      }
+      .x.axis text {
+        font-size: 13px;
+      }
+      .axis path {
+        display: none;
+      }
+      .y.axis line {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
+      let year = "2010";
+      const buttonYears = [
+        1950,
+        1955,
+        1960,
+        1965,
+        1970,
+        1975,
+        1980,
+        1985,
+        1990,
+        1995,
+        2000,
+        2005,
+        2010,
+        2015,
+        2020,
+        2025,
+        2030,
+        2035,
+        2040,
+        2045,
+        2050
+      ];
+
+      const width = 500;
+      const height = 500;
+      const margin = { top: 30, right: 0, bottom: 0, left: 100 };
+
+      const w = width - margin.left - margin.right;
+      const h = height - margin.top - margin.bottom;
+
+      const body = d3.select("body");
+
+      body.append("h2").text("Age distributton of the world");
+
+      const buttons = body
+        .append("div")
+        .attr("class", "buttons-container")
+        .selectAll("div")
+        .data(buttonYears)
+        .enter()
+        .append("div")
+        .text(d => d)
+        .attr("class", d => {
+          return d == year ? "button selected" : "button";
+        });
+
+      body.append("div").attr("class", "clearfix");
+
+      body
+        .append("div")
+        .attr("class", "top-label age-label")
+        .append("p")
+        .text("age group");
+      body
+        .append("div")
+        .attr("class", "top-label")
+        .append("p")
+        .text("portion of the population");
+
+      body.append("div").attr("class", "clearfix");
+
+      const x = d3.scale.linear().range([0, w]);
+      const y = d3.scale.ordinal().rangeBands([0, h], 0.2, 0);
+
+      const xAxis = d3.svg
+        .axis()
+        .scale(x)
+        .orient("top")
+        .ticks(5, "%");
+
+      const yAxis = d3.svg
+        .axis()
+        .scale(y)
+        .orient("left");
+
+      const keys = d => d.age;
+
+      d3.csv("popData.csv", (e, data) => {
+        let popData = data.filter(d => d.year === year);
+
+        x.domain([0, d3.max(data, d => d.value)]);
+        y.domain(popData.map(d => d.age));
+
+        const svg = body
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height)
+          .append("g")
+          .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        const barGroup = svg.append("g").attr("class", "bar");
+
+        const bars = barGroup
+          .selectAll("rect")
+          .data(popData, keys)
+          .enter()
+          .append("rect")
+          .attr("x", 0)
+          .attr("y", d => y(d.age))
+          .attr("width", d => x(d.value))
+          .attr("height", d => y.rangeBand());
+
+        buttons.on("click", function(d) {
+          d3.select(".selected").classed("selected", false);
+          d3.select(this).classed("selected", true);
+          year = d;
+
+          popData = data.filter(d => d.year == year);
+
+          bars
+            .data(popData, keys)
+            .transition()
+            .duration(500)
+            .ease("linear")
+            .attr("width", d => x(d.value));
+        });
+
+        svg
+          .append("g")
+          .call(xAxis)
+          .attr("class", "x axis");
+
+        svg
+          .append("g")
+          .call(yAxis)
+          .attr("class", "y axis");
+      });
+    </script>
+  </body>
+</html>
